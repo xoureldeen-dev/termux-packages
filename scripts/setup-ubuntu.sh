@@ -65,13 +65,12 @@ PACKAGES+=" xmlto"
 PACKAGES+=" xmltoman"
 
 # Needed by python modules (e.g. asciinema) and some build systems.
-PACKAGES+=" python3.10"
 PACKAGES+=" python3.11"
 PACKAGES+=" python3-pip"
 PACKAGES+=" python3-setuptools"
 PACKAGES+=" python-wheel-common"
-PACKAGES+=" python3.10-venv"
 PACKAGES+=" python3.11-venv"
+PACKAGES+=" python3.12-venv"
 
 # Needed by package bc.
 PACKAGES+=" ed"
@@ -190,7 +189,7 @@ PACKAGES+=" rsync"
 PACKAGES+=" wget"
 
 # Needed by codeblocks
-PACKAGES+=" libwxgtk3.0-gtk3-dev"
+PACKAGES+=" libwxgtk3.2-dev"
 PACKAGES+=" libgtk-3-dev"
 
 # Needed by packages in unstable repository.
@@ -220,7 +219,6 @@ PACKAGES+=" itstool"
 PACKAGES+=" libdbus-glib-1-dev-bin"
 PACKAGES+=" libgdk-pixbuf2.0-dev"
 PACKAGES+=" libwayland-dev"
-PACKAGES+=" python-setuptools"
 PACKAGES+=" python3-html5lib"
 PACKAGES+=" python3-xcbgen"
 PACKAGES+=" sassc"
@@ -325,19 +323,16 @@ $SUDO dpkg --add-architecture i386
 $SUDO cp $(dirname "$(realpath "$0")")/llvm-snapshot.gpg.key /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 $SUDO chmod a+r /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 {
-	echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main"
+	echo "deb [arch=amd64] http://apt.llvm.org/noble/ llvm-toolchain-noble-17 main"
 } | $SUDO tee /etc/apt/sources.list.d/apt-llvm-org.list > /dev/null
+
+# Add deadsnakes PPA to enable installing python 3.11:
+$SUDO add-apt-repository -y 'ppa:deadsnakes/ppa'
 
 $SUDO apt-get -yq update
 
 $SUDO env DEBIAN_FRONTEND=noninteractive \
 	apt-get install -yq --no-install-recommends $PACKAGES
-
-# Pip for python2.
-curl -L --output /tmp/py2-get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
-$SUDO python2 /tmp/py2-get-pip.py
-rm -f /tmp/py2-get-pip.py
-$SUDO rm -f /usr/local/bin/pip
 
 $SUDO locale-gen --purge en_US.UTF-8
 echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | $SUDO tee -a /etc/default/locale
