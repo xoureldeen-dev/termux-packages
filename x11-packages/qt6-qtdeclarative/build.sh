@@ -2,10 +2,10 @@ TERMUX_PKG_HOMEPAGE=https://www.qt.io/
 TERMUX_PKG_DESCRIPTION="Classes for QML and JavaScript languages"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="6.7.2"
+TERMUX_PKG_VERSION="6.8.0"
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL="https://download.qt.io/official_releases/qt/${TERMUX_PKG_VERSION%.*}/${TERMUX_PKG_VERSION}/submodules/qtdeclarative-everywhere-src-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256=4c29cba1af8c42d425d8eb6e01bad24cb80f4b983d71eef566a0542dfdb9b999
+TERMUX_PKG_SHA256=3b41a36b42e919a3aa0da1f71107591504200f41707bee2ad8e8d4f99b5644c2
 TERMUX_PKG_DEPENDS="libc++, qt6-qtbase"
 TERMUX_PKG_BUILD_DEPENDS="qt6-qtlanguageserver, qt6-shadertools"
 TERMUX_PKG_RECOMMENDS="qt6-qtlanguageserver"
@@ -53,6 +53,11 @@ termux_step_host_build() {
 termux_step_pre_configure() {
 	termux_setup_cmake
 	termux_setup_ninja
+
+	# The -flto flag seems to be used only when compiling and not linking,
+	# which breaks the NDK clang fallback to emulated TLS - see
+	# https://github.com/termux/termux-packages/issues/21733:
+	LDFLAGS+=" -flto"
 }
 
 termux_step_make_install() {
